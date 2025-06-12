@@ -64,6 +64,10 @@ app.delete('/api/menu/:id', (req, res) => {
     res.status(204).send();
 });
 
+app.get('/', (req, res) => {
+  res.send('API Menu Makanan Berjalan');
+});
+
 // Jalankan Server
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
