@@ -8,12 +8,10 @@ const fs = require('fs');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// In-memory database dengan data contoh
 let menuItems = [
   {
     id: "1",
@@ -65,14 +63,12 @@ let menuItems = [
   }
 ];
 
-// Helper function untuk generate ID baru
 const generateNewId = () => {
   if (menuItems.length === 0) return "1";
   const maxId = Math.max(...menuItems.map(item => parseInt(item.id)));
   return (maxId + 1).toString();
 };
 
-// Konfigurasi upload gambar
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const uploadDir = 'uploads';
@@ -104,7 +100,6 @@ const upload = multer({
   }
 });
 
-// Endpoint upload gambar
 app.post('/api/upload', upload.single('image'), (req, res) => {
   if (!req.file) {
     return res.status(400).json({ 
@@ -120,10 +115,8 @@ app.post('/api/upload', upload.single('image'), (req, res) => {
   });
 });
 
-// Serve static files
 app.use('/uploads', express.static('uploads'));
 
-// Middleware untuk validasi input menu
 const validateMenuItem = (req, res, next) => {
   const { name, description, price } = req.body;
   
@@ -144,7 +137,6 @@ const validateMenuItem = (req, res, next) => {
   next();
 };
 
-// CRUD Endpoints
 app.get('/api/menu', (req, res) => {
   res.json({
     success: true,
@@ -200,7 +192,6 @@ app.put('/api/menu/:id', validateMenuItem, (req, res) => {
     });
   }
   
-  // Cek kepemilikan menu
   if (menuItems[itemIndex].user_id && menuItems[itemIndex].user_id !== userId) {
     return res.status(403).json({ 
       success: false,
@@ -208,7 +199,6 @@ app.put('/api/menu/:id', validateMenuItem, (req, res) => {
     });
   }
   
-  // Update data
   const updatedItem = {
     ...menuItems[itemIndex],
     name,
@@ -239,7 +229,6 @@ app.delete('/api/menu/:id', (req, res) => {
     });
   }
   
-  // Cek kepemilikan menu
   if (menuItems[itemIndex].user_id && menuItems[itemIndex].user_id !== userId) {
     return res.status(403).json({ 
       success: false,
@@ -247,7 +236,6 @@ app.delete('/api/menu/:id', (req, res) => {
     });
   }
   
-  // Hapus menu
   const [deletedItem] = menuItems.splice(itemIndex, 1);
   
   res.json({
@@ -257,7 +245,6 @@ app.delete('/api/menu/:id', (req, res) => {
   });
 });
 
-// Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
   
@@ -274,7 +261,6 @@ app.use((err, req, res, next) => {
   });
 });
 
-// 404 handler
 app.use((req, res) => {
   res.status(404).json({
     success: false,
@@ -282,7 +268,6 @@ app.use((req, res) => {
   });
 });
 
-// Start server
 app.listen(PORT, () => {
   console.log(`Server berjalan di http://localhost:${PORT}`);
 });
